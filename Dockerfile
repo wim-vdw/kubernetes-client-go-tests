@@ -17,4 +17,4 @@ WORKDIR /
 
 COPY --from=build-stage /k8s-version-checker /k8s-version-checker
 
-CMD ["k8s-version-checker"]
+CMD ["/k8s-version-checker"]
