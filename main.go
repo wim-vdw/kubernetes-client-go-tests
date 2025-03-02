@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -43,7 +44,11 @@ func main() {
 	var client kubernetes.Interface
 	var err error
 
-	client, err = createClient("/Users/wim/.kube/k3s-raspberry.yaml", "raspberry")
+	kubeconfig := flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	context := flag.String("context", "", "context to use in the kubeconfig file")
+	flag.Parse()
+
+	client, err = createClient(*kubeconfig, *context)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
