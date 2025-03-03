@@ -45,10 +45,10 @@ func main() {
 	var err error
 
 	kubeconfig := flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	context := flag.String("context", "", "context to use in the kubeconfig file")
+	contextName := flag.String("context", "", "context to use in the kubeconfig file")
 	flag.Parse()
 
-	client, err = createClient(*kubeconfig, *context)
+	client, err = createClient(*kubeconfig, *contextName)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
