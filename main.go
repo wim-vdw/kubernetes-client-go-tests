@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"os"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -48,15 +50,29 @@ func main() {
 	contextName := flag.String("context", "", "context to use in the kubeconfig file")
 	flag.Parse()
 
+	// Initialize the Kubernetes client with the specified kubeconfig and context, exit on failure.
 	client, err = createClient(*kubeconfig, *contextName)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("unable to create kubernetes client: %v\n", err)
 		os.Exit(1)
 	}
+
+	// Get and print the Kubernetes server version from the cluster.
 	version, err := client.Discovery().ServerVersion()
 	if err != nil {
 		fmt.Printf("unable to determine Kubernetes version: %v\n", err)
 		os.Exit(1)
 	}
 	fmt.Printf("Kubernetes version: %s\n", version)
+
+	// List and print all Kubernetes namespaces in the current cluster context.
+	ctx := context.Background()
+	namespaces, err := client.CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		fmt.Printf("unable to get namespaces: %v\n", err)
+		os.Exit(1)
+	}
+	for _, namespace := range namespaces.Items {
+		fmt.Println(namespace.Name)
+	}
 }
