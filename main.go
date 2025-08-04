@@ -67,28 +67,24 @@ func main() {
 	fmt.Printf("Kubernetes version: %s\n", version)
 
 	// Get and print all nodes in the Kubernetes cluster.
-	fmt.Println("-------------")
-	fmt.Println("Cluster nodes")
-	fmt.Println("-------------")
+	fmt.Println("Cluster nodes:")
 	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		fmt.Printf("unable to get nodes: %v\n", err)
 		os.Exit(1)
 	}
 	for _, node := range nodes.Items {
-		fmt.Printf("%s (%s) -> %s\n", node.Name, node.Status.NodeInfo.Architecture, node.Status.NodeInfo.OSImage)
+		fmt.Printf("  %s (%s) -> %s\n", node.Name, node.Status.NodeInfo.Architecture, node.Status.NodeInfo.OSImage)
 	}
 
 	// Get and print all Kubernetes namespaces in the current cluster context.
-	fmt.Println("----------")
-	fmt.Println("Namespaces")
-	fmt.Println("----------")
+	fmt.Println("Namespaces:")
 	namespaces, err := client.CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		fmt.Printf("unable to get namespaces: %v\n", err)
 		os.Exit(1)
 	}
 	for _, namespace := range namespaces.Items {
-		fmt.Println(namespace.Name)
+		fmt.Printf("  %s\n", namespace.Name)
 	}
 }
