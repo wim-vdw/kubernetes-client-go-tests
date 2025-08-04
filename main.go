@@ -56,6 +56,7 @@ func main() {
 		fmt.Printf("unable to create kubernetes client: %v\n", err)
 		os.Exit(1)
 	}
+	ctx := context.Background()
 
 	// Get and print the Kubernetes server version from the cluster.
 	version, err := client.Discovery().ServerVersion()
@@ -65,8 +66,23 @@ func main() {
 	}
 	fmt.Printf("Kubernetes version: %s\n", version)
 
-	// List and print all Kubernetes namespaces in the current cluster context.
-	ctx := context.Background()
+	// Get and print all nodes in the Kubernetes cluster.
+	fmt.Println("-------------")
+	fmt.Println("Cluster nodes")
+	fmt.Println("-------------")
+	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		fmt.Printf("unable to get nodes: %v\n", err)
+		os.Exit(1)
+	}
+	for _, node := range nodes.Items {
+		fmt.Printf("%s (%s) -> %s\n", node.Name, node.Status.NodeInfo.Architecture, node.Status.NodeInfo.OSImage)
+	}
+
+	// Get and print all Kubernetes namespaces in the current cluster context.
+	fmt.Println("----------")
+	fmt.Println("Namespaces")
+	fmt.Println("----------")
 	namespaces, err := client.CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 	if err != nil {
 		fmt.Printf("unable to get namespaces: %v\n", err)
