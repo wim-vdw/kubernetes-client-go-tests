@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -56,7 +57,12 @@ func main() {
 		fmt.Printf("unable to create kubernetes client: %v\n", err)
 		os.Exit(1)
 	}
-	ctx := context.Background()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	defer cancel()
+
+	// Print the report time.
+	fmt.Println("Report time:", time.Now().Format(time.RFC3339))
 
 	// Get and print the Kubernetes server version from the cluster.
 	version, err := client.Discovery().ServerVersion()
