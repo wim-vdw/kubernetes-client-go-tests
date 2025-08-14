@@ -17,4 +17,4 @@ WORKDIR /
 
 COPY --from=build-stage /k8s-cluster-info /k8s-cluster-info
 
-CMD ["/k8s-cluster-info"]
+ENTRYPOINT ["/k8s-cluster-info"]
