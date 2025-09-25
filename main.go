@@ -50,9 +50,11 @@ func main() {
 
 	kubeconfig := flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	contextName := flag.String("context", "", "context to use in the kubeconfig file")
-	showModules := flag.Bool("show-modules", false, "display Go module version information")
-	showNodes := flag.Bool("show-nodes", false, "display cluster nodes")
-	showNamespaces := flag.Bool("show-namespaces", false, "display namespaces")
+	showAll := flag.Bool("all", false, "display all information (version, modules, nodes, namespaces)")
+	showVersion := flag.Bool("version", false, "display Kubernetes server version")
+	showModules := flag.Bool("modules", false, "display Go module version information")
+	showNodes := flag.Bool("nodes", false, "display cluster nodes")
+	showNamespaces := flag.Bool("namespaces", false, "display namespaces")
 	flag.Parse()
 
 	// Initialize the Kubernetes client with the specified kubeconfig and context, exit on failure.
@@ -68,8 +70,18 @@ func main() {
 	// Print the report time.
 	fmt.Println("Report time:", time.Now().Format(time.RFC3339))
 
+	// Get and print the Kubernetes server version from the cluster.
+	if *showVersion || *showAll {
+		version, err := client.Discovery().ServerVersion()
+		if err != nil {
+			fmt.Printf("unable to determine Kubernetes version: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("Kubernetes version: %s\n", version)
+	}
+
 	// Get and print Go module version information related to Kubernetes client libraries.
-	if *showModules {
+	if *showModules || *showAll {
 		info, ok := debug.ReadBuildInfo()
 		if !ok {
 			fmt.Println("No build info")
@@ -84,16 +96,8 @@ func main() {
 		}
 	}
 
-	// Get and print the Kubernetes server version from the cluster.
-	version, err := client.Discovery().ServerVersion()
-	if err != nil {
-		fmt.Printf("unable to determine Kubernetes version: %v\n", err)
-		os.Exit(1)
-	}
-	fmt.Printf("Kubernetes version: %s\n", version)
-
 	// Get and print all nodes in the Kubernetes cluster.
-	if *showNodes {
+	if *showNodes || *showAll {
 		fmt.Println("Cluster nodes:")
 		nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 		if err != nil {
@@ -106,7 +110,7 @@ func main() {
 	}
 
 	// Get and print all Kubernetes namespaces in the current cluster context.
-	if *showNamespaces {
+	if *showNamespaces || *showAll {
 		fmt.Println("Namespaces:")
 		namespaces, err := client.CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 		if err != nil {
