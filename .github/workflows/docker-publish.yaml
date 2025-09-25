@@ -8,7 +8,7 @@ on:
 jobs:
   publish_image:
     name: Push Docker image to Docker Hub
-    runs-on: arc-runner-set1
+    runs-on: arc-runner-set3-kubernetes-client-go-tests
     steps:
     - name: Check out the repo
       uses: actions/checkout@v4
