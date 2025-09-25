@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime/debug"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -49,6 +50,7 @@ func main() {
 
 	kubeconfig := flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	contextName := flag.String("context", "", "context to use in the kubeconfig file")
+	showModules := flag.Bool("show-modules", false, "display Go module version information")
 	showNodes := flag.Bool("show-nodes", false, "display cluster nodes")
 	showNamespaces := flag.Bool("show-namespaces", false, "display namespaces")
 	flag.Parse()
@@ -65,6 +67,22 @@ func main() {
 
 	// Print the report time.
 	fmt.Println("Report time:", time.Now().Format(time.RFC3339))
+
+	// Get and print Go module version information related to Kubernetes client libraries.
+	if *showModules {
+		info, ok := debug.ReadBuildInfo()
+		if !ok {
+			fmt.Println("No build info")
+			return
+		}
+
+		fmt.Println("Go module version information:")
+		for _, dep := range info.Deps {
+			if dep.Path == "k8s.io/client-go" || dep.Path == "k8s.io/api" || dep.Path == "k8s.io/apimachinery" {
+				fmt.Printf("  %s: %s\n", dep.Path, dep.Version)
+			}
+		}
+	}
 
 	// Get and print the Kubernetes server version from the cluster.
 	version, err := client.Discovery().ServerVersion()
