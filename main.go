@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 	"runtime/debug"
 	"time"
 
@@ -67,8 +68,9 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 	defer cancel()
 
-	// Print the report time.
+	// Print the report time and Go version.
 	fmt.Println("Report time:", time.Now().Format(time.RFC3339))
+	fmt.Println("Go version:", runtime.Version())
 
 	// Get and print the Kubernetes server version from the cluster.
 	if *showVersion || *showAll {
