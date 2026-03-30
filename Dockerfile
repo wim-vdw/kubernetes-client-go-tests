@@ -9,7 +9,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -v -o /k8s-cluster-info ./...
 
-FROM alpine:3.22
+FROM alpine:3.23.3
 
 RUN apk add --no-cache tzdata
 
